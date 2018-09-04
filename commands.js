@@ -16,7 +16,7 @@ for(var span in spans){
             var left = frac[1]-frac[0]
             var hour = Math.floor((left  * 10) / 60)
             var min = left * 10 % 60
-            span.innerHTML = split[0] + " " + split[1] + " " + split[2] + " " + split[3] + " " + hour + "h " + min + "m left"
+            span.innerHTML = split[0] + " " + split[1] + " " + split[2] + " " + split[3] + " " + hour + "h " + min + "m left<br>"
         }
     }
 }
