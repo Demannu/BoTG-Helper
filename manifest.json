@@ -10,12 +10,12 @@
         "http://baronsofthegalaxy.com/*",
         "https://baronsofthegalaxy.com/*"
       ],
-      "js": ["commands.js"],
+      "js": ["boot.js"],
       "run_at": "document_end"
     }
   ],
-
   "permissions":[ 
     "tabs", "http://www.baronsofthegalaxy.com/*"
-  ]
+  ],
+  "web_accessible_resources": ["ui.js"]
 }
