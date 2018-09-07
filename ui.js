@@ -16,6 +16,51 @@ function checkTurn(){
     }
 }
 
+function scrapeDemand(){
+    var planet = document.getElementById("ctl00_ContentPlaceHolder1_lblLeftNavHeading2").innerHTML;
+    var city = document.getElementById("ctl00_ContentPlaceHolder1_lblLeftNavHeading").innerHTML;
+    var demandTable = document.getElementById("ctl00_ContentPlaceHolder1_gvGridDemandCategories");
+    var entry = []
+    for(var row in demandTable.rows){
+        row = demandTable.rows[row];
+            if(row.cells){
+                if(row.cells[2].innerHTML.length > 10){
+                    var name = row.cells[0].innerHTML.split(">")[1].split("<")[0];
+                    if(name !== "(return to top)"){
+                        var avg = row.cells[2].innerHTML.split(">")[1].split("<")[0];
+                        var val = row.cells[3].innerHTML;
+                        var vol = row.cells[4].innerHTML;
+                        entry.push({
+                            planet: planet,
+                            city: city,
+                            resource: name,
+                            avg: avg,
+                            val: val,
+                            vol: vol,
+                            time: Date.now()
+                        })
+                    }
+
+                }
+            }
+    }
+    console.log(entry)
+}
+
+if(document.getElementById("ctl00_ContentPlaceHolder1_tabVSDemand").className == "hoverLeftNavTabON"){
+    if(document.getElementById("ctl00_ContentPlaceHolder1_rbDemandByProduct").checked){
+        scrapeDemand();
+    } else {
+        var parent = document.getElementById("ctl00_ContentPlaceHolder1_cbGridDemand").parentElement 
+        var infoSpan = document.createElement("span");
+        infoSpan.style = "color: orange;";
+        infoSpan.innerHTML = "<br>Change display to By Products"
+        var infoPanel = parent.appendChild(infoSpan)
+    }
+}
+
+
+
 var spans = document.getElementsByTagName('span');
 for(var span in spans){
     var span = spans[span]
@@ -24,10 +69,15 @@ for(var span in spans){
             var split = span.innerHTML.split("-")
             var strip = split[1].split("<")
             var frac = strip[0].split("/")
-            var left = frac[1]-frac[0]
-            var hour = Math.floor((left  * 10) / 60)
-            var min = left * 10 % 60
-            span.innerHTML = split[0] + " " + hour + "h " + min + "m left<br>"
+            if(frac[1]>frac[0]){
+                var left = frac[1]-frac[0]
+                var hour = Math.floor((left  * 10) / 60)
+                var min = left * 10 % 60
+                span.innerHTML = split[0] + " " + hour + "h " + min + "m left<br>"
+            } else {
+                span.innerHTML = split[0] + " | Queued<br>";
+            }
+            
         } else if(span.innerHTML.search(/(turn)\(s\)/) > -1){
             var split = span.innerHTML.split(" ");
             var turnOther = split.indexOf("turn(s)")
@@ -40,7 +90,7 @@ for(var span in spans){
     }
 }
 
-setInterval(checkTurn, 5000)
+setInterval(checkTurn, 2000)
 var tableTimer = setInterval(function(){
     if(document.getElementById("ctl00_ContentPlaceHolder1_gvCorpHQStructureQueue")){
         var table = document.getElementById("ctl00_ContentPlaceHolder1_gvCorpHQStructureQueue");
