@@ -16,20 +16,20 @@ function checkTurn(){
     }
 }
 
-function scrapeDemand(){
-    var planet = document.getElementById("ctl00_ContentPlaceHolder1_lblLeftNavHeading2").innerHTML;
+function scrapeViewscreen(activeTab){
+    var turn = document.getElementById("ctl00_lblCurrTurn").innerHTML;
     var city = document.getElementById("ctl00_ContentPlaceHolder1_lblLeftNavHeading").innerHTML;
-    var demandTable = document.getElementById("ctl00_ContentPlaceHolder1_gvGridDemandCategories");
-    for(var row in demandTable.rows){
-        row = demandTable.rows[row];
-        if(row.cells){
-            if(row.cells[2].innerHTML.length > 10){
-                var name = row.cells[0].innerHTML.split(">")[1].split("<")[0];
+    var planet = document.getElementById("ctl00_ContentPlaceHolder1_lblLeftNavHeading2").innerHTML;
+    var scrapeTable = document.getElementById("ctl00_ContentPlaceHolder1_gvGrid" + activeTab + "Categories");
+    for(var row in scrapeTable.rows){
+        row = scrapeTable.rows[row]
+        if(row.cells && row.cells[2].innerHTML.length > 10){
+            var name = row.cells[0].innerHTML.split(">")[1].split("<")[0];
+            if(activeTab == "Demand"){
                 if(name !== "(return to top)"){
                     var avg = row.cells[2].innerHTML.split(">")[1].split("<")[0];
                     var val = row.cells[3].innerHTML;
                     var vol = row.cells[4].innerHTML;
-                    var turn = document.getElementById("ctl00_lblCurrTurn").innerHTML;
                     $.post("http://api.zvarpensg.xyz/demand", {
                         planet: planet,
                         city: city,
@@ -40,37 +40,27 @@ function scrapeDemand(){
                         turn: Number(turn)
                     })
                 }
-
-            }
-        }
-    }
-}
-
-function scrapeIndustry(){
-    var planet = document.getElementById("ctl00_ContentPlaceHolder1_lblLeftNavHeading2").innerHTML;
-    var city = document.getElementById("ctl00_ContentPlaceHolder1_lblLeftNavHeading").innerHTML;
-    var demandTable = document.getElementById("ctl00_ContentPlaceHolder1_gvGridIndustryCategories");
-    for(var row in demandTable.rows){
-        row = demandTable.rows[row];
-        if(row.cells){
-            if(row.cells[2].innerHTML.length > 10){
-                var name = row.cells[0].innerHTML.split(">")[1].split("<")[0];
+            } else if(activeTab == "Industry"){
                 if(name !== "(return to top)"){
-                    var avg = row.cells[2].innerHTML.split(">")[1].split("<")[0];
-                    var val = row.cells[3].innerHTML;
-                    var vol = row.cells[4].innerHTML;
-                    var turn = document.getElementById("ctl00_lblCurrTurn").innerHTML;
+                    var out = row.cells[2].innerHTML;
+                    var cnt = row.cells[3].innerHTML;
+                    if(cnt == "---"){
+                        cnt = 0;
+                    }
+                    if(!Number(out)){
+                        out = 0;
+                    } else {
+                        out = out.replace("↵", " ").replace(" ","").trim()
+                    }
                     $.post("http://api.zvarpensg.xyz/industry", {
                         planet: planet,
                         city: city,
                         resource: name,
-                        avg: avg,
-                        val: val,
-                        vol: vol,
+                        output: Number(out),
+                        count: Number(cnt),
                         turn: Number(turn)
                     })
                 }
-
             }
         }
     }
@@ -93,22 +83,14 @@ function scrapeIndustry(){
 // Military: ctl00_ContentPlaceHolder1_tabVSMilitary
 
 
-if(document.getElementById("ctl00_tabViewscreen").className == "hoverTabON"){
+if(document.getElementById("ctl00_ContentPlaceHolder1_upViewscreen")){
     var planet = document.getElementById("ctl00_ContentPlaceHolder1_lblLeftNavHeading2").innerHTML;
     var city = document.getElementById("ctl00_ContentPlaceHolder1_lblLeftNavHeading").innerHTML;
-    var panels = {
-        "overview": "ctl00_ContentPlaceHolder1_tabVSOverview",
-        "resources": "ctl00_ContentPlaceHolder1_tabVSResources",
-        "industry": "ctl00_ContentPlaceHolder1_tabVSIndustry",
-        "demand": "ctl00_ContentPlaceHolder1_tabVSDemand",
-        "military": "ctl00_ContentPlaceHolder1_tabVSMilitary"
-    }
-    var activePanel = document.getElementsByClassName("hoverLeftNavTabON")[0].id.split("VS")[1].toLowerCase();
-
+    var activePanel = document.getElementsByClassName("hoverLeftNavTabON")[0].id.split("VS")[1]
     switch(activePanel){
-        case "overview":
+        case "Overview":
             break;
-        case "resources":
+        case "Resources":
             var resourceArray = [];
             var resourceObject = {};
             var parent = document.getElementById("ctl00_ContentPlaceHolder1_btnResByHex").parentElement.parentElement.parentElement.parentElement
@@ -124,11 +106,10 @@ if(document.getElementById("ctl00_tabViewscreen").className == "hoverTabON"){
             for(var i=2; i<resourceArray.length; i++){
                 resourceObject[resourceArray[i][0].replace(":","")] = resourceArray[i][1]
             }
-            console.log(resourceObject);
             break;
-        case "industry":
+        case "Industry":
             if(document.getElementById("ctl00_ContentPlaceHolder1_rbIndustryByProduct").checked){
-                scrapeIndustry();
+                scrapeViewscreen(activePanel)
             } else {
                 var parent = document.getElementById("ctl00_ContentPlaceHolder1_cbGridIndustry").parentElement 
                 var infoSpan = document.createElement("span");
@@ -137,9 +118,9 @@ if(document.getElementById("ctl00_tabViewscreen").className == "hoverTabON"){
                 var infoPanel = parent.appendChild(infoSpan)
             }
             break;
-        case "demand":
+        case "Demand":
             if(document.getElementById("ctl00_ContentPlaceHolder1_rbDemandByProduct").checked){
-                scrapeDemand();
+                scrapeViewscreen(activePanel)
             } else {
                 var parent = document.getElementById("ctl00_ContentPlaceHolder1_cbGridDemand").parentElement 
                 var infoSpan = document.createElement("span");
@@ -148,7 +129,7 @@ if(document.getElementById("ctl00_tabViewscreen").className == "hoverTabON"){
                 var infoPanel = parent.appendChild(infoSpan)
             }
             break;
-        case "military":
+        case "Military":
             break;
     }
 }
@@ -201,7 +182,6 @@ var tableTimer = setInterval(function(){
             row = rows[row];
             if(row.innerHTML){
                 if(row.innerHTML.indexOf("$") > -1 && row.innerHTML.indexOf("<") == -1){
-                    console.log(row.innerHTML);
                     totalCost += Number(row.innerHTML.replace("$","").replace(",",""));
                 } else if(Number(row.innerHTML)){
                     totalTime += Number(row.innerHTML);
