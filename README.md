@@ -1,6 +1,8 @@
 # BoTG-Helper
 Chrome Extension for http://baronsofthegalaxy.com
 
+Front end for public data: http://api.zvarpensg.xyz/
+
 # Purpose
 Provide augmented information and display for BoTG, bringing quality of life improvements to the UI and general flow of the game.
 The core principle of the extension is to provide a shared quick reference to the games cities info and stats, instead of juggling table displays, multiple windows, and manual math you'll be able to view, side by side compare, and calculate values from a single page in the game. 
