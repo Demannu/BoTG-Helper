@@ -20,46 +20,45 @@ function scrapeDemand(){
     var planet = document.getElementById("ctl00_ContentPlaceHolder1_lblLeftNavHeading2").innerHTML;
     var city = document.getElementById("ctl00_ContentPlaceHolder1_lblLeftNavHeading").innerHTML;
     var demandTable = document.getElementById("ctl00_ContentPlaceHolder1_gvGridDemandCategories");
-    var entry = []
     for(var row in demandTable.rows){
         row = demandTable.rows[row];
-            if(row.cells){
-                if(row.cells[2].innerHTML.length > 10){
-                    var name = row.cells[0].innerHTML.split(">")[1].split("<")[0];
-                    if(name !== "(return to top)"){
-                        var avg = row.cells[2].innerHTML.split(">")[1].split("<")[0];
-                        var val = row.cells[3].innerHTML;
-                        var vol = row.cells[4].innerHTML;
-                        entry.push({
-                            planet: planet,
-                            city: city,
-                            resource: name,
-                            avg: avg,
-                            val: val,
-                            vol: vol,
-                            time: Date.now()
-                        })
-                    }
-
+        if(row.cells){
+            if(row.cells[2].innerHTML.length > 10){
+                var name = row.cells[0].innerHTML.split(">")[1].split("<")[0];
+                if(name !== "(return to top)"){
+                    var avg = row.cells[2].innerHTML.split(">")[1].split("<")[0];
+                    var val = row.cells[3].innerHTML;
+                    var vol = row.cells[4].innerHTML;
+                    var turn = document.getElementById("ctl00_lblCurrTurn").innerHTML;
+                    $.post("http://api.zvarpensg.xyz/demand", {
+                        planet: planet,
+                        city: city,
+                        resource: name,
+                        avg: avg,
+                        val: val,
+                        vol: vol,
+                        turn: Number(turn)
+                    })
                 }
+
             }
-    }
-    console.log(entry)
-}
-
-if(document.getElementById("ctl00_ContentPlaceHolder1_tabVSDemand").className == "hoverLeftNavTabON"){
-    if(document.getElementById("ctl00_ContentPlaceHolder1_rbDemandByProduct").checked){
-        scrapeDemand();
-    } else {
-        var parent = document.getElementById("ctl00_ContentPlaceHolder1_cbGridDemand").parentElement 
-        var infoSpan = document.createElement("span");
-        infoSpan.style = "color: orange;";
-        infoSpan.innerHTML = "<br>Change display to By Products"
-        var infoPanel = parent.appendChild(infoSpan)
+        }
     }
 }
 
-
+if(document.getElementById("ctl00_ContentPlaceHolder1_tabVSDemand")){
+    if(document.getElementById("ctl00_ContentPlaceHolder1_tabVSDemand").className == "hoverLeftNavTabON"){
+        if(document.getElementById("ctl00_ContentPlaceHolder1_rbDemandByProduct").checked){
+            scrapeDemand();
+        } else {
+            var parent = document.getElementById("ctl00_ContentPlaceHolder1_cbGridDemand").parentElement 
+            var infoSpan = document.createElement("span");
+            infoSpan.style = "color: orange;";
+            infoSpan.innerHTML = "<br>Change display to By Products"
+            var infoPanel = parent.appendChild(infoSpan)
+        }
+    }
+}
 
 var spans = document.getElementsByTagName('span');
 for(var span in spans){
