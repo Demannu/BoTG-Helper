@@ -1,7 +1,10 @@
 # BoTG-Helper
 Chrome Extension for http://baronsofthegalaxy.com
 
-Front end for public data: http://api.zvarpensg.xyz/
+# Releases
+
+(Front End) http://api.zvarpensg.xyz/
+(Extension) https://chrome.google.com/webstore/detail/beta-botg-helper-extended/cnfemhcjojldnijpebkhccnjhbbhainm
 
 # Purpose
 Provide augmented information and display for BoTG, bringing quality of life improvements to the UI and general flow of the game.
