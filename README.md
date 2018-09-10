@@ -4,6 +4,7 @@ Chrome Extension for http://baronsofthegalaxy.com
 # Releases
 
 (Front End) http://api.zvarpensg.xyz/
+
 (Extension) https://chrome.google.com/webstore/detail/beta-botg-helper-extended/cnfemhcjojldnijpebkhccnjhbbhainm
 
 # Purpose
