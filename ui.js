@@ -1,3 +1,10 @@
+var params={};
+window.location.search
+  .replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str,key,value) {
+    params[key] = value;
+  }
+);
+
 function turnConvert(turns){
     var hours = Math.floor((turns  * 10) / 60)
     var min = turns * 10 % 60
@@ -66,6 +73,50 @@ function scrapeViewscreen(activeTab){
     }
 }
 
+function scrapeOrders(){
+    var scrapeTable = document.getElementById("ctl00_ContentPlaceHolder1_gvOrders")
+    var orders = []
+    var locs = []
+    var toggle = false;
+    for(var i=1; i<scrapeTable.rows.length;i++){
+        var row = scrapeTable.rows[i]
+        orders.push({
+            num: row.cells[2].innerHTML,
+            type: row.cells[3].innerHTML,
+            detail: row.cells[4].innerHTML
+        })
+    }
+    orders.sort();
+    for(var i=0; i<orders.length;i++){
+        var order = orders[i]
+        if(order.type == "Move To Location" && !toggle){
+            toggle = !toggle;
+            i++;
+            var suborders = [];
+            console.log(order)
+            console.log(orders)
+            console.log(i)
+            while(orders[i] && orders[i].type !== "Move To Location" && orders[i].type !== "Loop Order"){
+                suborders.push(orders[i]);
+                console.log("Suborder :" + orders[i])
+                i++
+            }
+            locs.push({[order.detail]:suborders});
+            toggle = !toggle
+            i--
+        }
+    }
+    console.log(locs)
+}
+var activeURL = window.location.href;
+var activePage = window.location.href.split("?")[0].split(".com/")[1]
+if(activePage == "assets.aspx" && params.tid == "20"){
+    // This is a military unit, transport or otherwise
+    $("#ctl00_ContentPlaceHolder1_tabAssetMilitaryOrders").click(function(){
+        setTimeout(scrapeOrders,2500);
+    })
+}
+
 // Viewscreen (Parent): ctl00_tabViewscreen
 // Overview: ctl00_ContentPlaceHolder1_tabVSOverview
 //  Population: ctl00_ContentPlaceHolder1_lblOverviewPopulation
@@ -91,10 +142,11 @@ if(document.getElementById("ctl00_ContentPlaceHolder1_upViewscreen")){
         case "Overview":
             break;
         case "Resources":
+            /* Not Needed 
             var resourceArray = [];
             var resourceObject = {};
-            var parent = document.getElementById("ctl00_ContentPlaceHolder1_btnResByHex").parentElement.parentElement.parentElement.parentElement
-            parent.id="resourceTable"
+            var parent = document.getElementById("ctl00_ContentPlaceHolder1_btnResByHex").parentElement.parentElement.parentElement.parentElement;
+            parent.id="resourceTable";
             $("table#resourceTable tr").each(function() {
                 var arrayOfThisRow = [];
                 var tableData = $(this).find('td');
@@ -104,14 +156,17 @@ if(document.getElementById("ctl00_ContentPlaceHolder1_upViewscreen")){
                 }
             });
             for(var i=2; i<resourceArray.length; i++){
-                resourceObject[resourceArray[i][0].replace(":","")] = resourceArray[i][1]
+                resourceObject[resourceArray[i][0].replace(":","")] = resourceArray[i][1];
             }
+            $.post({
+                url: "http://api.zvarpensg.xyz/static/"
+            })*/
             break;
         case "Industry":
             if(document.getElementById("ctl00_ContentPlaceHolder1_rbIndustryByProduct").checked){
                 scrapeViewscreen(activePanel)
             } else {
-                var parent = document.getElementById("ctl00_ContentPlaceHolder1_cbGridIndustry").parentElement 
+                var parent = document.getElementById("ctl00_ContentPlaceHolder1_cbGridIndustry").parentElement;
                 var infoSpan = document.createElement("span");
                 infoSpan.style = "color: orange;";
                 infoSpan.innerHTML = "<br>Change display to By Products"
