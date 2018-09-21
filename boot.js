@@ -7,7 +7,13 @@ function bootstrap(script){
     (document.head || document.documentElement).appendChild(s);
 }
 
-var manifestData = chrome.runtime.getManifest();
-for(var s in manifestData.web_accessible_resources){
-    bootstrap(manifestData.web_accessible_resources[s])
-}
+chrome.storage.sync.get(["plugins"], function(results){
+    var plugins = results.plugins
+    var manifestData = chrome.runtime.getManifest();
+    for(var s in manifestData.web_accessible_resources){
+        s = manifestData.web_accessible_resources[s]
+        if(plugins[s.replace(".js","")] && plugins[s.replace(".js","")].enabled ){
+            bootstrap(s)
+        }
+    }
+})
