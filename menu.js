@@ -1,5 +1,5 @@
 chrome.storage.sync.get(["plugins"], function(config){
-    if(config.toString().length < 5){
+    if(JSON.stringify(config).length < 5){
         chrome.storage.sync.set({
             "plugins": {
                 "autoRefresh": {
